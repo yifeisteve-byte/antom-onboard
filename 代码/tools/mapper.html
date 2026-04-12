@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>单元格定位助手 (开发工具)</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; margin: 20px; color: #222; }
+  h1 { font-size: 18px; }
+  .sheet { margin-top: 20px; border: 1px solid #ccc; border-radius: 6px; padding: 12px 16px; }
+  .sheet h2 { font-size: 15px; margin: 0 0 8px; color: #2563eb; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td { padding: 4px 8px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  td.addr { width: 60px; color: #9ca3af; font-family: ui-monospace, monospace; }
+  td.val { white-space: pre-wrap; word-break: break-word; }
+  input[type=file] { margin-top: 10px; }
+  .hint { color: #6b7280; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>xlsx 单元格定位助手</h1>
+<p class="hint">开发用工具：上传一份 xlsx 模板，查看所有非空单元格及其地址，用于在 <code>js/schema.js</code> 里填 <code>cell</code> 字段。数据不会上传到任何服务器。</p>
+<input type="file" id="f" accept=".xlsx">
+<div id="out"></div>
+
+<script src="../vendor/exceljs.min.js"></script>
+<script>
+document.getElementById('f').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const buf = await file.arrayBuffer();
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.load(buf);
+  const out = document.getElementById('out');
+  out.innerHTML = '';
+  wb.eachSheet(ws => {
+    const section = document.createElement('div');
+    section.className = 'sheet';
+    const h = document.createElement('h2');
+    h.textContent = `Sheet: "${ws.name}"  (${ws.rowCount} × ${ws.columnCount})`;
+    section.appendChild(h);
+    const table = document.createElement('table');
+    ws.eachRow({ includeEmpty: false }, row => {
+      row.eachCell({ includeEmpty: false }, cell => {
+        const v = cell.value;
+        if (v === null || v === undefined || v === '') return;
+        let display = typeof v === 'object' ? (v.richText ? v.richText.map(r => r.text).join('') : (v.text || JSON.stringify(v))) : String(v);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="addr">${cell.address}</td><td class="val"></td>`;
+        tr.querySelector('.val').textContent = display;
+        table.appendChild(tr);
+      });
+    });
+    section.appendChild(table);
+    out.appendChild(section);
+  });
+});
+</script>
+</body>
+</html>
