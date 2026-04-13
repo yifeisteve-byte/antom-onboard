@@ -41,6 +41,13 @@ const TRANSFORMS = {
     return String(v).toLowerCase().includes('sole') || String(v).toLowerCase() === 'individual' ? 'Individual' : 'Corporate';
   },
 
+  // USD → JPY（固定汇率 150，四舍五入为整数）
+  jpy: v => {
+    if (v === null || v === undefined || v === '') return '';
+    const n = Number(String(v).replace(/[,，%\s]/g, ''));
+    return Number.isFinite(n) ? Math.round(n * 150) : '';
+  },
+
   // Y/N
   yesno: v => {
     if (v === true || v === 'Y' || v === 'y' || v === 'yes' || v === '是') return 'Y';

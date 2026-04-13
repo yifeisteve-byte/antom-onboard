@@ -123,8 +123,15 @@ function renderFill(root) {
   }
   for (const f of FIELDS) if (f.always) neededFieldIds.add(f.id);
 
+  // 日本 APM：根据 japan_payment_methods 过滤条件字段（showIfMethod）
+  const jpMethods = Array.isArray(state.values.japan_payment_methods) ? state.values.japan_payment_methods : [];
+  const isFieldActive = (f) => {
+    if (!f.showIfMethod) return true;
+    return f.showIfMethod.some(m => jpMethods.includes(m));
+  };
+
   // 工具栏
-  const filled = FIELDS.filter(f => neededFieldIds.has(f.id) && state.values[f.id]).length;
+  const filled = FIELDS.filter(f => neededFieldIds.has(f.id) && isFieldActive(f) && state.values[f.id]).length;
   const tb = h(`<div class="toolbar">
     <div class="count">共 ${neededFieldIds.size} 个字段需要填写，已填 ${filled} 个</div>
     <div>
@@ -135,7 +142,11 @@ function renderFill(root) {
   tb.querySelector('#back').onclick = () => navigate('select');
   tb.querySelector('#next').onclick = () => {
     // 校验必填
-    const missing = [...requiredSet].filter(fid => !state.values[fid]);
+    const missing = [...requiredSet].filter(fid => {
+      const f = FIELD_BY_ID[fid];
+      if (f && !isFieldActive(f)) return false;
+      return !state.values[fid];
+    });
     if (missing.length) {
       const labels = missing.map(fid => FIELD_BY_ID[fid]?.labelZh || fid).join('、');
       if (!confirm(`以下必填项尚未填写：\n${labels}\n\n仍然继续？`)) return;
@@ -147,7 +158,7 @@ function renderFill(root) {
   // 按 group 分区渲染
   let fieldNo = 0;
   for (const group of FIELD_GROUPS) {
-    const fields = FIELDS.filter(f => f.group === group.id && neededFieldIds.has(f.id) && !f.hidden);
+    const fields = FIELDS.filter(f => f.group === group.id && neededFieldIds.has(f.id) && !f.hidden && isFieldActive(f));
     if (!fields.length) continue;
     const section = h(`<section class="form-section"><h2>${escape(group.label)}</h2></section>`);
     for (const f of fields) {
@@ -207,7 +218,7 @@ function renderField(f, required, no) {
     const selected = Array.isArray(val) ? val : [];
     const box = h(`<div class="multiselect">${
       f.options.map(o => `<label style="display:inline-flex;align-items:center;margin-right:14px;font-weight:400">
-        <input type="checkbox" value="${escape(o)}" ${selected.includes(o) ? 'checked' : ''}> ${escape(o)}
+        <input type="checkbox" value="${escape(o)}" ${selected.includes(o) ? 'checked' : ''}> ${escape(o)}${f.optionNotes && f.optionNotes[o] ? ` <span style="color:#dc2626;font-size:12px;margin-left:4px">${escape(f.optionNotes[o])}</span>` : ''}
       </label>`).join('')
     }</div>`);
     box.querySelectorAll('input[type=checkbox]').forEach(cb => {
@@ -215,6 +226,7 @@ function renderField(f, required, no) {
         const cur = box.querySelectorAll('input[type=checkbox]:checked');
         state.values[f.id] = [...cur].map(x => x.value);
         persistDebounced();
+        if (f.id === 'japan_payment_methods') render();
       });
     });
     wrap.appendChild(box);

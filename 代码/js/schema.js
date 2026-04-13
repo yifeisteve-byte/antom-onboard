@@ -15,7 +15,8 @@ const FIELD_GROUPS = [
   { id: 'ch_mpay',       label: '渠道专属 · 澳门 MPay' },
   { id: 'ch_korea',      label: '渠道专属 · 韩国 Toss / KKP' },
   { id: 'ch_jcb',        label: '渠道专属 · 信用卡 JCB' },
-  { id: 'ch_ddq',        label: '渠道专属 · Credit Risk DDQ 风险问卷' }
+  { id: 'ch_ddq',        label: '渠道专属 · Credit Risk DDQ 风险问卷' },
+  { id: 'ch_japan',      label: '渠道专属 · 日本 APM（merpay / auPAY / FamiPay / Konbini / Pay-easy）' }
 ];
 
 const FIELDS = [
@@ -131,7 +132,31 @@ const FIELDS = [
   { id: 'ddq_medicine',          labelZh: 'DDQ · 是否涉及医药 / 医疗器械',        labelEn: 'Medicine/Medical',      type: 'select',   group: 'ch_ddq', options: ['Yes', 'No'], default: 'No' },
   { id: 'ddq_cloud_storage',     labelZh: 'DDQ · 是否提供云储存服务',             labelEn: 'Cloud Storage',         type: 'select',   group: 'ch_ddq', options: ['Yes', 'No'], default: 'No' },
   { id: 'ddq_subscription',      labelZh: 'DDQ · 是否提供订阅服务',               labelEn: 'Subscription',          type: 'select',   group: 'ch_ddq', options: ['Yes', 'No'], default: 'No' },
-  { id: 'ddq_crypto',            labelZh: 'DDQ · 是否涉及加密货币',               labelEn: 'Crypto Involved',       type: 'select',   group: 'ch_ddq', options: ['Yes', 'No'], default: 'No' }
+  { id: 'ddq_crypto',            labelZh: 'DDQ · 是否涉及加密货币',               labelEn: 'Crypto Involved',       type: 'select',   group: 'ch_ddq', options: ['Yes', 'No'], default: 'No' },
+
+  // --- 日本 APM 专属 ---
+  { id: 'japan_payment_methods',    labelZh: '日本 APM · 申请的支付方式',     labelEn: 'Japan Payment Methods',       type: 'multiselect', group: 'ch_japan',
+    options: ['merpay', 'auPAY', 'FamiPay', 'Konbini', 'Pay-easy'], default: ['merpay', 'auPAY'],
+    optionNotes: { FamiPay: '仅支持日本主体报备' } },
+  { id: 'merchant_name_ja',         labelZh: '日本 APM · 商户日本营业名称（日文）',   labelEn: 'Merchant Name (JP)',  type: 'text',     group: 'ch_japan',
+    hint: 'Konbini & Pay-easy 限 12 字以内' },
+  { id: 'jp_business_type',         labelZh: '日本 APM · 业务类型（从以下内容中选择：电商类 / 数娱类 / 服务业）', labelEn: 'Business Type', type: 'select', group: 'ch_japan',
+    options: ['General ECOM Merchandise', 'Digital Contents', 'Continuous Services'], default: 'Digital Contents' },
+  { id: 'jp_license_required',      labelZh: '日本 APM · 是否涉及以下业务内容：介绍工作和劳务派遣 / 房地产中介 / 二手商品、回收商品和古董 / 旅行社', labelEn: 'Required License', type: 'select', group: 'ch_japan',
+    options: ['Yes', 'No'], default: 'No' },
+  { id: 'jp_corporate_postal_code', labelZh: '日本 APM · 公司所在地邮政编码',  labelEn: 'Corporate Post(Zip) Code',    type: 'text',     group: 'ch_japan', placeholder: '000-0000' },
+  { id: 'jp_director_gender',       labelZh: '日本 APM · 代表人的性别',        labelEn: "Director's Gender",           type: 'select',   group: 'ch_japan',
+    options: ['male', 'female'], default: 'male' },
+  { id: 'jp_capital_jpy',           labelZh: '日本 APM · 公司注册资本金（金额单位：日元）', labelEn: 'Capital (JPY)', type: 'number', group: 'ch_japan', default: 10000000 },
+  { id: 'jp_sca_page_url',          labelZh: '日本 APM · 特商法页面 URL',      labelEn: 'URL of SCTA Page',            type: 'url',      group: 'ch_japan', placeholder: 'https://' },
+  { id: 'jp_famipay_prepaid',       labelZh: 'FamiPay · 是否已登记資金決済法（回答 0 或 1）', labelEn: 'Prepaid Payment (0/1)', type: 'select', group: 'ch_japan',
+    options: ['0', '1'], default: '0', showIfMethod: ['FamiPay'] },
+  { id: 'jp_konbini_payment_limit_days', labelZh: 'Konbini/Pay-easy · 支付期限：网上下单后实际去 Konbini 店铺进行支付的有效日期（日数 0-99）', labelEn: 'Payment Limit Day', type: 'number', group: 'ch_japan',
+    default: 7, showIfMethod: ['Konbini', 'Pay-easy'] },
+  { id: 'jp_konbini_cash_refund',   labelZh: 'Konbini/Pay-easy · 是否支持 Cash Refund（Refund via Store Credit / PayPal 禁止）', labelEn: 'Cash Refund Availability', type: 'select', group: 'ch_japan',
+    options: ['Yes', 'No'], default: 'Yes', showIfMethod: ['Konbini', 'Pay-easy'] },
+  { id: 'jp_cs_hours_from',         labelZh: '日本 APM · Customer Service 电话对应开始时间', labelEn: 'Customer Service Hour From',  type: 'text',     group: 'ch_japan', default: '09:00', showIfMethod: ['Konbini', 'Pay-easy'] },
+  { id: 'jp_cs_hours_until',        labelZh: '日本 APM · Customer Service 电话对应结束时间', labelEn: 'Customer Service Hour Until', type: 'text',     group: 'ch_japan', default: '18:00', showIfMethod: ['Konbini', 'Pay-easy'] }
 ];
 
 // Lookup helper
@@ -148,8 +173,8 @@ const CHANNELS = [
   { id: 'sea',         name: '东南亚（2C2P / DANA / TrueMoney）' },
   { id: 'taiwan',      name: '台湾' },
   { id: 'korea',       name: '韩国（KKP / Tosspay / Naverpay + 本地银行卡）' },
-  { id: 'macau',       name: '澳门（MPay）' }
-  // Phase 之后会加入: japan
+  { id: 'macau',       name: '澳门（MPay）' },
+  { id: 'japan',       name: '日本 APM（merpay / auPAY / FamiPay / Konbini / Pay-easy）' }
 ];
 
 // 用于 DDQ 的 Yes/No checkbox 组合辅助
@@ -480,6 +505,94 @@ const TEMPLATES = [
       { fieldId: 'director_dob',          sheet: 'Korea Card&Bank Transfer', cell: 'B8', transform: 'date_iso' }
     ],
     required: ['company_dba_en', 'kr_settlement_scenario', 'signer_last_name']
+  },
+
+  // --- 日本 APM（merpay / auPAY / FamiPay / Konbini / Pay-easy 统一申请表）---
+  {
+    id: 'jp_apm_all',
+    channel: 'japan',
+    displayName: 'Japan APM 统一申请表（merpay / auPAY / FamiPay / Konbini / Pay-easy）',
+    filename: 'merpay-aupay-famipay-konbini-payeasy-Application Form 2.0.xlsx',
+    path: 'templates/merpay-aupay-famipay-konbini-payeasy-Application Form 2.0.xlsx',
+    mappings: (() => {
+      const S = 'Application Form '; // 注意末尾空格
+      const R = 10;                    // 填写行
+      const has = (v, m) => Array.isArray(v.japan_payment_methods) && v.japan_payment_methods.includes(m);
+      const flag = m => v => has(v, m) ? 1 : 0;
+      return [
+        // C-G 五种支付方式 0/1 开关
+        { sheet: S, cell: `C${R}`, composeFields: ['japan_payment_methods'], compose: flag('merpay') },
+        { sheet: S, cell: `D${R}`, composeFields: ['japan_payment_methods'], compose: flag('auPAY') },
+        { sheet: S, cell: `E${R}`, composeFields: ['japan_payment_methods'], compose: flag('FamiPay') },
+        { sheet: S, cell: `F${R}`, composeFields: ['japan_payment_methods'], compose: flag('Konbini') },
+        { sheet: S, cell: `G${R}`, composeFields: ['japan_payment_methods'], compose: flag('Pay-easy') },
+        // H-I 业务类型 / 许认可
+        { fieldId: 'jp_business_type',         sheet: S, cell: `H${R}` },
+        { fieldId: 'jp_license_required',      sheet: S, cell: `I${R}` },
+        // J-P 公司信息
+        { fieldId: 'company_name_legal',       sheet: S, cell: `J${R}` },
+        { fieldId: 'business_reg_number',      sheet: S, cell: `K${R}` },
+        { fieldId: 'jp_corporate_postal_code', sheet: S, cell: `L${R}` },
+        { fieldId: 'operation_address',        sheet: S, cell: `M${R}` },
+        { fieldId: 'business_url',             sheet: S, cell: `N${R}` },
+        { fieldId: 'business_phone',           sheet: S, cell: `O${R}` },
+        { fieldId: 'incorporation_date',       sheet: S, cell: `P${R}`, transform: 'date_jp' },
+        // Q-W 店铺信息
+        { fieldId: 'merchant_name_ja',         sheet: S, cell: `Q${R}` },
+        { fieldId: 'company_dba_en',           sheet: S, cell: `R${R}` },
+        { fieldId: 'business_url',             sheet: S, cell: `S${R}` },
+        { fieldId: 'product_description',      sheet: S, cell: `T${R}` },
+        // U 登录密码 -> 空
+        { fieldId: 'business_phone',           sheet: S, cell: `V${R}` },
+        { fieldId: 'business_email',           sheet: S, cell: `W${R}` },
+        // X-AB 金额 / 交易量（USD → JPY 汇率 150）
+        { fieldId: 'avg_transaction_value',        sheet: S, cell: `X${R}`, transform: 'jpy' },
+        { fieldId: 'jp_capital_jpy',               sheet: S, cell: `Y${R}`, transform: 'number' },
+        { fieldId: 'annual_processing_volume_usd', sheet: S, cell: `Z${R}`, transform: 'jpy' },
+        { fieldId: 'monthly_transaction_count',    sheet: S, cell: `AA${R}`, transform: 'number' },
+        { fieldId: 'order_amount_max_usd',         sheet: S, cell: `AB${R}`, transform: 'jpy' },
+        // AC-AI 法人 UBO 段 —— 留空
+        // AJ-AM 个人 UBO 段 —— 复用 signer_/director_
+        { sheet: S, cell: `AJ${R}`, composeFields: ['signer_first_name', 'signer_last_name'],
+          compose: v => [v.signer_first_name, v.signer_last_name].filter(Boolean).join(' ') },
+        { fieldId: 'jp_director_gender',       sheet: S, cell: `AK${R}` },
+        { fieldId: 'director_dob',             sheet: S, cell: `AL${R}`, transform: 'date_jp' },
+        { fieldId: 'director_address',         sheet: S, cell: `AM${R}` },
+        // AN-AQ Director 信息
+        { fieldId: 'signer_last_name',         sheet: S, cell: `AN${R}` },
+        { fieldId: 'signer_first_name',        sheet: S, cell: `AO${R}` },
+        { fieldId: 'jp_director_gender',       sheet: S, cell: `AP${R}` },
+        { fieldId: 'director_dob',             sheet: S, cell: `AQ${R}`, transform: 'date_jp' },
+        // AR-AW 特商法 6 项（硬编码）
+        { sheet: S, cell: `AR${R}`, compose: () => 'Yes' },
+        { sheet: S, cell: `AS${R}`, compose: () => 'No' },
+        { sheet: S, cell: `AT${R}`, compose: () => 'No' },
+        { sheet: S, cell: `AU${R}`, compose: () => 'No' },
+        { sheet: S, cell: `AV${R}`, compose: () => 'No' },
+        { sheet: S, cell: `AW${R}`, compose: () => 'No' },
+        // AX MerPay 文档说明栏 —— 留空
+        // AY FamiPay 专属（仅选 FamiPay 时写）
+        { sheet: S, cell: `AY${R}`, composeFields: ['japan_payment_methods', 'jp_famipay_prepaid'],
+          compose: v => has(v, 'FamiPay') ? (v.jp_famipay_prepaid ?? '') : '' },
+        // AZ Konbini/Pay-easy 支付期限
+        { sheet: S, cell: `AZ${R}`, composeFields: ['japan_payment_methods', 'jp_konbini_payment_limit_days'],
+          compose: v => (has(v, 'Konbini') || has(v, 'Pay-easy')) ? (v.jp_konbini_payment_limit_days ?? '') : '' },
+        // BA 特商法页面 URL
+        { fieldId: 'jp_sca_page_url',          sheet: S, cell: `BA${R}` },
+        // BB Cash Refund
+        { sheet: S, cell: `BB${R}`, composeFields: ['japan_payment_methods', 'jp_konbini_cash_refund'],
+          compose: v => (has(v, 'Konbini') || has(v, 'Pay-easy')) ? (v.jp_konbini_cash_refund ?? '') : '' },
+        // BC-BD CS 时间
+        { fieldId: 'jp_cs_hours_from',         sheet: S, cell: `BC${R}` },
+        { fieldId: 'jp_cs_hours_until',        sheet: S, cell: `BD${R}` }
+        // BE OTA 专用 —— 留空
+      ];
+    })(),
+    required: ['japan_payment_methods', 'company_name_legal', 'merchant_name_ja',
+               'company_dba_en', 'business_url', 'business_phone', 'business_email',
+               'signer_first_name', 'signer_last_name', 'director_dob', 'operation_address',
+               'avg_transaction_value', 'annual_processing_volume_usd', 'jp_capital_jpy',
+               'jp_sca_page_url', 'jp_business_type', 'jp_corporate_postal_code']
   }
 ];
 
