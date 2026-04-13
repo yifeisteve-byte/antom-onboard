@@ -189,9 +189,9 @@ const TEMPLATES = [
   {
     id: 'vm_card',
     channel: 'credit_card',
-    displayName: 'Visa / Master 卡 (Checkout & Nuvei & VM 直连)',
-    filename: 'VM卡（Checkout & Nuvei &VM直连卡) (1).xlsx',
-    path: 'templates/VM卡（Checkout & Nuvei &VM直连卡) (1).xlsx',
+    displayName: 'Visa / Master 卡',
+    filename: 'Visa ／ Master 卡.xlsx',
+    path: 'templates/Visa ／ Master 卡.xlsx',
     mappings: [
       { fieldId: 'company_dba_en',             sheet: 'Sheet1', cell: 'B2' },
       { fieldId: 'business_url',               sheet: 'Sheet1', cell: 'B3' },
@@ -221,9 +221,9 @@ const TEMPLATES = [
   {
     id: 'sea_2c2p_generic',
     channel: 'sea',
-    displayName: '2C2P APM 通用（除越南 ZaloPay / Momo）',
-    filename: '2C2P APM-0817-Updated.xlsx',
-    path: 'templates/2C2P APM-0817-Updated.xlsx',
+    displayName: '东南亚 电子钱包（除越南 ZaloPay / Momo）',
+    filename: '东南亚 电子钱包（除越南 ZaloPay ／ Momo）.xlsx',
+    path: 'templates/东南亚 电子钱包（除越南 ZaloPay ／ Momo）.xlsx',
     mappings: [
       { fieldId: 'company_name_legal',        sheet: 'sheet', cell: 'D5' },
       { fieldId: 'company_dba_en',            sheet: 'sheet', cell: 'D6' },
