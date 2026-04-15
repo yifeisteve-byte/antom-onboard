@@ -14,7 +14,7 @@ const Filler = {
   },
 
   async fillOne(template, values) {
-    const res = await fetch(encodeURI(template.path));
+    const res = await fetch(encodeURI(template.path), { cache: 'no-cache' });
     if (!res.ok) throw new Error(`无法加载模板 ${template.path}: ${res.status}`);
     const buf = await res.arrayBuffer();
 

@@ -16,7 +16,13 @@ const FIELD_GROUPS = [
   { id: 'ch_korea',      label: '渠道专属 · 韩国 Toss / KKP' },
   { id: 'ch_jcb',        label: '渠道专属 · 信用卡 JCB' },
   { id: 'ch_ddq',        label: '渠道专属 · Credit Risk DDQ 风险问卷' },
-  { id: 'ch_japan',      label: '渠道专属 · 日本 APM（merpay / auPAY / FamiPay / Konbini / Pay-easy）' }
+  { id: 'ch_japan',      label: '渠道专属 · 日本 APM（merpay / auPAY / FamiPay / Konbini / Pay-easy）' },
+  { id: 'ch_paypay',     label: '渠道专属 · 日本 PayPay' },
+  { id: 'ch_hk_octopus', label: '渠道专属 · 香港八达通' },
+  { id: 'ch_turkey',     label: '渠道专属 · 土耳其 Iyzico' },
+  { id: 'ch_tamara',     label: '渠道专属 · 中东 Tamara' },
+  { id: 'ch_brazil',     label: '渠道专属 · 南美（Dlocal / STONE / Mercado Pago / PicPay）' },
+  { id: 'ch_europe',     label: '渠道专属 · 欧洲（PPRO / Pay by Bank）' }
 ];
 
 const FIELDS = [
@@ -136,7 +142,7 @@ const FIELDS = [
 
   // --- 日本 APM 专属 ---
   { id: 'japan_payment_methods',    labelZh: '日本 APM · 申请的支付方式',     labelEn: 'Japan Payment Methods',       type: 'multiselect', group: 'ch_japan',
-    options: ['merpay', 'auPAY', 'FamiPay', 'Konbini', 'Pay-easy'], default: ['merpay', 'auPAY'],
+    options: ['merpay', 'auPAY', 'FamiPay', 'Konbini', 'Pay-easy', 'PayPay'], default: ['merpay', 'auPAY'],
     optionNotes: { FamiPay: '仅支持日本主体报备' } },
   { id: 'merchant_name_ja',         labelZh: '日本 APM · 商户日本营业名称（日文）',   labelEn: 'Merchant Name (JP)',  type: 'text',     group: 'ch_japan',
     hint: 'Konbini & Pay-easy 限 12 字以内' },
@@ -156,7 +162,137 @@ const FIELDS = [
   { id: 'jp_konbini_cash_refund',   labelZh: 'Konbini/Pay-easy · 是否支持 Cash Refund（Refund via Store Credit / PayPal 禁止）', labelEn: 'Cash Refund Availability', type: 'select', group: 'ch_japan',
     options: ['Yes', 'No'], default: 'Yes', showIfMethod: ['Konbini', 'Pay-easy'] },
   { id: 'jp_cs_hours_from',         labelZh: '日本 APM · Customer Service 电话对应开始时间', labelEn: 'Customer Service Hour From',  type: 'text',     group: 'ch_japan', default: '09:00', showIfMethod: ['Konbini', 'Pay-easy'] },
-  { id: 'jp_cs_hours_until',        labelZh: '日本 APM · Customer Service 电话对应结束时间', labelEn: 'Customer Service Hour Until', type: 'text',     group: 'ch_japan', default: '18:00', showIfMethod: ['Konbini', 'Pay-easy'] }
+  { id: 'jp_cs_hours_until',        labelZh: '日本 APM · Customer Service 电话对应结束时间', labelEn: 'Customer Service Hour Until', type: 'text',     group: 'ch_japan', default: '18:00', showIfMethod: ['Konbini', 'Pay-easy'] },
+
+  // --- PayPay 专属（由 jp_paypay 模板驱动显示，不用 showIfMethod）---
+  { id: 'paypay_is_overseas', labelZh: 'PayPay · 报备主体是否在日本境外（Yes 时跳过 Sheet1 本土段，改填 Sheet3）', labelEn: 'Head office outside Japan?', type: 'select',
+    group: 'ch_paypay', options: ['Yes', 'No'], default: 'Yes' },
+  { id: 'paypay_contact_person', labelZh: 'PayPay · 填写人姓名', labelEn: 'Person who completed this', type: 'text',
+    group: 'ch_paypay', hidden: true },
+  { id: 'paypay_rep_name_native', labelZh: 'PayPay · 董事/UBO 姓名（母语）', labelEn: 'Director/UBO name (native)', type: 'text',
+    group: 'ch_paypay' },
+  { id: 'paypay_rep_name_roman', labelZh: 'PayPay · 董事/UBO 姓名（罗马字 / 英文）', labelEn: 'Director/UBO name (Roman)', type: 'text',
+    group: 'ch_paypay' },
+  { id: 'paypay_capital', labelZh: 'PayPay · 注册资本（格式 xxxx JPY / xxxx USD/ xxxx HKD）', labelEn: 'Capital', type: 'text',
+    group: 'ch_paypay' },
+  { id: 'paypay_ubo_name_native', labelZh: 'PayPay · UBO 姓名（母语）', labelEn: 'UBO name (native)', type: 'text',
+    group: 'ch_paypay', hidden: true },
+  { id: 'paypay_ubo_name_en', labelZh: 'PayPay · UBO 姓名（罗马字 / 英文）', labelEn: 'UBO name (Roman)', type: 'text',
+    group: 'ch_paypay', hidden: true },
+  { id: 'paypay_ubo_address', labelZh: 'PayPay · UBO 当前居住地址', labelEn: 'UBO address', type: 'text',
+    group: 'ch_paypay', hidden: true },
+  { id: 'paypay_ubo_dob', labelZh: 'PayPay · UBO 出生日期', labelEn: 'UBO DOB', type: 'date',
+    group: 'ch_paypay', hidden: true },
+  { id: 'paypay_business_reg_no', labelZh: 'PayPay · 企业注册号 / Corporate Number', labelEn: 'Corporate / Registration Number', type: 'text',
+    group: 'ch_paypay', hidden: true },
+  { id: 'paypay_jp_legal_rep', labelZh: 'PayPay · 是否在日本设有法定代表人或委托律师事务所（仅海外主体）', labelEn: 'Legal rep / law firm in Japan', type: 'select',
+    group: 'ch_paypay', options: ['Yes', 'No'], default: 'No' },
+  { id: 'paypay_jp_support', labelZh: 'PayPay · 发生纠纷时用户能否获得日语支持', labelEn: 'Japanese user support', type: 'select',
+    group: 'ch_paypay', options: ['Yes', 'No'], default: 'Yes' },
+  { id: 'paypay_support_channels', labelZh: 'PayPay · 日语支持渠道说明（邮件 / 电话 / 时段等）', labelEn: 'Support channels', type: 'textarea',
+    group: 'ch_paypay' },
+  { id: 'paypay_psp_name', labelZh: 'PayPay · PSP（支付服务提供商）名称', labelEn: 'PSP name', type: 'text',
+    group: 'ch_paypay', default: 'Antom' },
+  { id: 'paypay_is_platform', labelZh: 'PayPay · 预期业务模式是否为平台型业务', labelEn: 'Platform business?', type: 'select',
+    group: 'ch_paypay', options: ['Yes', 'No'], default: 'No' },
+  { id: 'paypay_trade_name', labelZh: 'PayPay · 商号（PayPay 用户消费明细中显示的服务名称）', labelEn: 'Trade Name', type: 'text',
+    group: 'ch_paypay', hidden: true },
+  { id: 'paypay_payment_method_type', labelZh: 'PayPay · 期望的支付方式', labelEn: 'Payment method type', type: 'select',
+    group: 'ch_paypay', options: ['Online/オンライン', 'Offline/オフライン'], default: 'Online/オンライン' },
+  { id: 'paypay_use_case', labelZh: 'PayPay · 使用场景详细说明', labelEn: 'Use case details', type: 'textarea',
+    group: 'ch_paypay', default: '使用paypay让用户充值' },
+  { id: 'paypay_implementation_url', labelZh: 'PayPay · 接入 PayPay 支付的网站 URL（页面必须含日语）', labelEn: 'Implementation URL', type: 'url',
+    group: 'ch_paypay', placeholder: 'https://', hidden: true },
+  { id: 'paypay_site_in_japanese', labelZh: 'PayPay · 商品购买页是否可供 PayPay 审核（页面须含日语）', labelEn: 'Site reviewable in Japanese', type: 'select',
+    group: 'ch_paypay', options: ['Yes/はい', 'No/いいえ'], default: 'Yes/はい' },
+  { id: 'paypay_prices_in_jpy', labelZh: 'PayPay · 商品展示价格是否包含日元', labelEn: 'Prices displayed in JPY', type: 'select',
+    group: 'ch_paypay', options: ['Yes/はい', 'No/いいえ'], default: 'Yes/はい' },
+  { id: 'paypay_tos_url', labelZh: 'PayPay · 服务条款页面 URL', labelEn: 'Terms of Service URL', type: 'url',
+    group: 'ch_paypay', placeholder: 'https://' },
+  { id: 'paypay_tos_refund_clause', labelZh: 'PayPay · 服务条款中"退款 / 取消"条款原文摘录', labelEn: 'ToS refund clause', type: 'textarea',
+    group: 'ch_paypay' },
+  { id: 'paypay_legal_notice_url', labelZh: 'PayPay · 特商法标示页面 URL', labelEn: 'Legal Notice URL', type: 'url',
+    group: 'ch_paypay', placeholder: 'https://' },
+  { id: 'paypay_privacy_url', labelZh: 'PayPay · 隐私条款页面 URL', labelEn: 'Privacy Policy URL', type: 'url',
+    group: 'ch_paypay', placeholder: 'https://' },
+  { id: 'paypay_prepaid_instrument', labelZh: 'PayPay · 是否属于网络道具点卡充值', labelEn: 'Prepaid payment instrument', type: 'select',
+    group: 'ch_paypay', options: ['Yes/はい', 'No/いいえ'], default: 'No/いいえ' },
+  { id: 'paypay_fsa_registration_required', labelZh: 'PayPay · 是否需向金融厅（FSA）申报登记', labelEn: 'FSA registration required', type: 'select',
+    group: 'ch_paypay', options: ['Yes/はい', 'No/いいえ'], default: 'No/いいえ' },
+  { id: 'paypay_fsa_notified', labelZh: 'PayPay · 是否已向金融厅 / 财务局申报', labelEn: 'FSA already notified', type: 'select',
+    group: 'ch_paypay', options: ['Yes/はい', 'No/いいえ'], default: 'No/いいえ' },
+  { id: 'paypay_fsa_url', labelZh: 'PayPay · 资金決済法披露页面 URL', labelEn: 'FSA disclosure URL', type: 'url',
+    group: 'ch_paypay', placeholder: 'https://' },
+  { id: 'paypay_connection_type', labelZh: 'PayPay · 线上接入方式', labelEn: 'Connection method', type: 'select',
+    group: 'ch_paypay',
+    options: ['Online merchant (Web Payment)', 'Online merchant (Native Payment (Server-to-Server API Payment))', 'Online merchant (continuous billing (Server-to-Server API Payment))', 'Online merchant (Smart Payment)'],
+    default: 'Online merchant (Web Payment)' },
+  { id: 'paypay_data_server_in_jp', labelZh: 'PayPay · 存放 PayPay 相关用户及交易数据的服务器是否位于日本境内', labelEn: 'Data server in Japan', type: 'select',
+    group: 'ch_paypay', options: ['Yes/はい', 'No/いいえ'], default: 'No/いいえ', hideIfWebPay: true },
+  { id: 'paypay_data_server_location', labelZh: 'PayPay · 数据服务器所在国家 / 地区', labelEn: 'Data server location', type: 'text',
+    group: 'ch_paypay', hideIfWebPay: true },
+  { id: 'paypay_data_access_from_abroad', labelZh: 'PayPay · 是否可从日本以外国家访问 PayPay 相关数据', labelEn: 'Access from abroad', type: 'select',
+    group: 'ch_paypay', options: ['Yes/はい', 'No/いいえ'], default: 'Yes/はい', hideIfWebPay: true },
+  { id: 'paypay_data_access_countries', labelZh: 'PayPay · 可访问 PayPay 相关数据的所有国家 / 地区', labelEn: 'Access countries', type: 'textarea',
+    group: 'ch_paypay', hideIfWebPay: true },
+
+  // --- 香港八达通 专属 ---
+  // company_name_zh / company_dba_zh 自动取英文字段值，不在表单中显示
+  { id: 'company_name_zh',    labelZh: '公司法定名称（繁体中文，选填）', labelEn: 'Company Legal Name (Chinese)', type: 'text', group: 'ch_hk_octopus', hidden: true },
+  { id: 'company_dba_zh',     labelZh: '经营名称 DBA（繁体中文，选填）', labelEn: 'Trading Name (Chinese)',       type: 'text', group: 'ch_hk_octopus', hidden: true },
+  { id: 'hk_entity_location', labelZh: '香港八达通 · 公司所在地（非港主体填写）', labelEn: 'Entity Location (non-HK)', type: 'text', group: 'ch_hk_octopus' },
+
+  // --- 中东 Tamara 专属 ---
+  { id: 'tamara_annual_sales', labelZh: 'Tamara · 年销售额区间', labelEn: 'Reported Annual Sales', type: 'select', group: 'ch_tamara',
+    options: ['Large Enterprise (More than $200 million)', 'Enterprise ($15 million to $200 million)',
+              'Large Business ($5 million to $15 million)', 'Medium Business ($1 million to $5 million)',
+              'Small Business ($250 thousand to $1 million)', 'Micro Business (Less than $250 thousand)'],
+    default: 'Small Business ($250 thousand to $1 million)' },
+  { id: 'tamara_country_reg', labelZh: 'Tamara · 注册国家', labelEn: 'Country of Registration', type: 'text', group: 'ch_tamara', placeholder: 'e.g. Saudi Arabia' },
+  { id: 'tamara_country_ops', labelZh: 'Tamara · 运营国家（沙特 / 阿联酋）', labelEn: 'Country of Operations', type: 'select', group: 'ch_tamara',
+    options: ['Saudi Arabia', 'United Arab Emirates', 'Saudi Arabia, United Arab Emirates'],
+    default: 'Saudi Arabia' },
+  { id: 'tamara_product',     labelZh: 'Tamara · 申请产品（BNPL / PIF）', labelEn: 'Product Requested', type: 'select', group: 'ch_tamara',
+    options: ['BNPL', 'PIF', 'BNPL / PIF'], default: 'BNPL' },
+
+  // --- 南美巴西 专属（Dlocal / STONE / Mercado Pago / PicPay）---
+  { id: 'brazil_cnpj',             labelZh: '巴西税务号 CNPJ',                         labelEn: 'Tax ID (CNPJ)',                     type: 'text',     group: 'ch_brazil' },
+  { id: 'brazil_country_incorp',   labelZh: '注册国家',                                 labelEn: 'Country of Incorporation',          type: 'text',     group: 'ch_brazil', placeholder: 'e.g. Brazil' },
+  { id: 'brazil_subsellers',       labelZh: '子商户分配说明',                           labelEn: 'Allocation of Sub-sellers',         type: 'textarea', group: 'ch_brazil' },
+  { id: 'brazil_settlement_time',  labelZh: '结算时间（如 T+30）',                      labelEn: 'Settlement Time',                   type: 'text',     group: 'ch_brazil', placeholder: 'e.g. T+30' },
+  { id: 'brazil_contact_email',    labelZh: '联系人邮箱（巴西联系人）',                 labelEn: 'Responsible Contact Email',         type: 'email',    group: 'ch_brazil' },
+  { id: 'brazil_cpf',              labelZh: 'CPF 个人税号',                             labelEn: 'CPF (Brazilian Taxpayer ID)',        type: 'text',     group: 'ch_brazil' },
+  { id: 'brazil_mother_name',      labelZh: '联系人母亲姓名',                           labelEn: "Contact Mother's Name",             type: 'text',     group: 'ch_brazil' },
+  { id: 'brazil_dob',              labelZh: '联系人出生日期',                           labelEn: 'Contact Date of Birth',             type: 'text',     group: 'ch_brazil', placeholder: 'e.g. 1990-01-15' },
+  { id: 'brazil_position',         labelZh: '联系人职位',                               labelEn: 'Position / Title',                  type: 'text',     group: 'ch_brazil' },
+  { id: 'brazil_monthly_income',   labelZh: '联系人月收入',                             labelEn: 'Monthly Income',                    type: 'text',     group: 'ch_brazil', placeholder: 'e.g. BRL 10,000' },
+  { id: 'brazil_expected_tpv',     labelZh: '预期月 / 年交易量 TPV',                    labelEn: 'Expected TPV',                      type: 'text',     group: 'ch_brazil' },
+  { id: 'brazil_installment_share',labelZh: '分期交易占比',                             labelEn: 'Share by Installment',              type: 'text',     group: 'ch_brazil', placeholder: 'e.g. 30%' },
+  { id: 'brazil_card_network_share',labelZh: '各卡组织份额',                            labelEn: 'Share by Card Network',             type: 'text',     group: 'ch_brazil', placeholder: 'e.g. Visa 50% / Master 50%' },
+  { id: 'brazil_platinization',    labelZh: '预期 Platinization 率',                    labelEn: 'Expected Platinization',            type: 'text',     group: 'ch_brazil' },
+  { id: 'mp_product',              labelZh: 'Mercado Pago · 申请产品',                  labelEn: 'Mercado Pago Product',              type: 'select',   group: 'ch_brazil',
+    options: ['Checkout PRO', 'Checkout API', 'PISP'], default: 'Checkout PRO' },
+  { id: 'picpay_dedicated_mid',    labelZh: 'PicPay · 是否需要专属 MID',               labelEn: 'Dedicated MID Required',            type: 'select',   group: 'ch_brazil',
+    options: ['Yes', 'No'], default: 'No' },
+  { id: 'brazil_aov',              labelZh: '平均订单金额 AOV',                         labelEn: 'Average Order Value (AOV)',         type: 'text',     group: 'ch_brazil', placeholder: 'e.g. BRL 150' },
+  { id: 'picpay_products',         labelZh: 'PicPay · 使用产品（Wallet / One-Click）', labelEn: 'PicPay Products',                   type: 'text',     group: 'ch_brazil', placeholder: 'Wallet / One-Click' },
+
+  // --- 欧洲 专属（PPRO / Pay by Bank Token）---
+  // PPRO：UBO 与 Director 默认同一人，地址信息两段共用
+  { id: 'ppro_native_name', labelZh: 'PPRO · 母语姓名（证件上的名字）',   labelEn: 'Native Name (on ID)',           type: 'text',   group: 'ch_europe' },
+  { id: 'ppro_country',     labelZh: 'PPRO · 所在国家',                   labelEn: 'Country',                       type: 'text',   group: 'ch_europe', placeholder: 'e.g. Germany' },
+  { id: 'ppro_province',    labelZh: 'PPRO · 省 / 州 / 地区',             labelEn: 'Province / Region / State',     type: 'text',   group: 'ch_europe' },
+  { id: 'ppro_city',        labelZh: 'PPRO · 城市',                       labelEn: 'City or Town',                  type: 'text',   group: 'ch_europe' },
+  { id: 'ppro_postal',      labelZh: 'PPRO · 邮政编码',                   labelEn: 'Postal / ZIP Code',             type: 'text',   group: 'ch_europe' },
+  { id: 'ppro_street',      labelZh: 'PPRO · 街道地址',                   labelEn: 'Street Address',                type: 'text',   group: 'ch_europe' },
+  // Pay by Bank Token
+  { id: 'eu_sole_trader',     labelZh: 'Pay by Bank · 是否个体商户',      labelEn: 'Sole Trader',                   type: 'select', group: 'ch_europe', options: ['Yes', 'No'], default: 'No' },
+  { id: 'eu_publicly_listed', labelZh: 'Pay by Bank · 是否上市公司',      labelEn: 'Publicly Listed',               type: 'select', group: 'ch_europe', options: ['Yes', 'No'], default: 'No' },
+  { id: 'eu_uk_only',         labelZh: 'Pay by Bank · 是否仅服务英国用户', labelEn: 'Serve UK Users Only',           type: 'select', group: 'ch_europe', options: ['Yes', 'No'], default: 'No' },
+  { id: 'eu_jurisdiction',    labelZh: 'Pay by Bank · 注册国家 / 地区',   labelEn: 'Jurisdiction',                  type: 'text',   group: 'ch_europe', placeholder: 'e.g. United Kingdom' },
+  { id: 'eu_ubo_count',       labelZh: 'Pay by Bank · UBO 数量',          labelEn: 'Number of UBOs',                type: 'number', group: 'ch_europe', default: 1 },
+  { id: 'eu_director_count',  labelZh: 'Pay by Bank · 董事数量',          labelEn: 'Number of Directors',           type: 'number', group: 'ch_europe', default: 1 },
+
 ];
 
 // Lookup helper
@@ -170,11 +306,16 @@ const FIELD_BY_ID = Object.fromEntries(FIELDS.map(f => [f.id, f]));
 
 const CHANNELS = [
   { id: 'credit_card', name: '信用卡' },
-  { id: 'sea',         name: '东南亚（2C2P / DANA / TrueMoney）' },
+  { id: 'sea',         name: '东南亚（2C2P / DANA / TrueMoney / 菲律宾 QRPH）' },
   { id: 'taiwan',      name: '台湾' },
   { id: 'korea',       name: '韩国（KKP / Tosspay / Naverpay + 本地银行卡）' },
   { id: 'macau',       name: '澳门（MPay）' },
-  { id: 'japan',       name: '日本 APM（merpay / auPAY / FamiPay / Konbini / Pay-easy）' }
+  { id: 'japan',       name: '日本 APM（merpay / auPAY / FamiPay / Konbini / Pay-easy）' },
+  { id: 'hk',          name: '香港（八达通）' },
+  { id: 'turkey',      name: '土耳其（Iyzico）' },
+  { id: 'middle_east',   name: '中东（Tamara）' },
+  { id: 'south_america', name: '南美（Dlocal / STONE / Mercado Pago / PicPay）' },
+  { id: 'europe',        name: '欧洲（PPRO / Pay by Bank）' }
 ];
 
 // 用于 DDQ 的 Yes/No checkbox 组合辅助
@@ -315,6 +456,34 @@ const TEMPLATES = [
                'company_name_legal', 'registration_country', 'business_reg_number',
                'operation_address', 'business_phone', 'signer_last_name',
                'director_phone', 'director_email', 'expected_launch_date']
+  },
+
+  // --- 菲律宾 QRPH ---
+  {
+    id: 'ph_qrph',
+    channel: 'sea',
+    displayName: '菲律宾 QRPH',
+    filename: '菲律宾QRPH.xlsx',
+    path: 'templates/菲律宾QRPH.xlsx',
+    mappings: [
+      { fieldId: 'company_name_legal',  sheet: 'Sheet1', cell: 'B2' },
+      { fieldId: 'business_reg_number', sheet: 'Sheet1', cell: 'B3' },
+      { fieldId: 'company_dba_en',      sheet: 'Sheet1', cell: 'B4' },
+      { fieldId: 'mcc',                 sheet: 'Sheet1', cell: 'B5' },
+      { fieldId: 'operation_address',   sheet: 'Sheet1', cell: 'B6' },
+      { fieldId: 'mcc',                 sheet: 'Sheet1', cell: 'B7' },
+      { fieldId: 'mcc',                 sheet: 'Sheet1', cell: 'B8' },
+      { fieldId: 'business_url',        sheet: 'Sheet1', cell: 'B9' },
+      { sheet: 'Sheet1', cell: 'B10', composeFields: ['annual_processing_volume_usd'],
+        compose: v => v.annual_processing_volume_usd ? String(Math.round(Number(v.annual_processing_volume_usd) / 10)) : '' },
+      { sheet: 'Sheet1', cell: 'B11', composeFields: ['annual_processing_volume_usd'],
+        compose: v => v.annual_processing_volume_usd ? String(Math.round(Number(v.annual_processing_volume_usd) / 10)) : '' },
+      { fieldId: 'avg_transaction_value', sheet: 'Sheet1', cell: 'B12' },
+      // B13 Licenses — attachment, skip
+      { fieldId: 'expected_launch_date',sheet: 'Sheet1', cell: 'B14', transform: 'date_slash' }
+    ],
+    required: ['company_name_legal', 'business_reg_number', 'company_dba_en',
+               'operation_address', 'mcc', 'business_url', 'expected_launch_date']
   },
 
   // --- 台湾 JKOPay ---
@@ -593,6 +762,378 @@ const TEMPLATES = [
                'signer_first_name', 'signer_last_name', 'director_dob', 'operation_address',
                'avg_transaction_value', 'annual_processing_volume_usd', 'jp_capital_jpy',
                'jp_sca_page_url', 'jp_business_type', 'jp_corporate_postal_code']
+  },
+
+  // --- 日本 PayPay（海外商户入驻申请表）---
+  {
+    id: 'jp_paypay',
+    channel: 'japan',
+    displayName: 'PayPay 日本（海外商户入驻表）',
+    filename: 'PAYPAY-Information Request Sheet for Overseas Merchants_v2.3_20251029.xlsx',
+    path: 'templates/PAYPAY-Information Request Sheet for Overseas Merchants_v2.3_20251029.xlsx',
+    mappings: (() => {
+      const S1 = '(1)Corporate Information';
+      const S3 = '(3)Overseas corporation';
+      const isOverseas = v => v.paypay_is_overseas === 'Yes';
+      // 本土段：仅 is_overseas='No' 时写入
+      const dom = (fid, tf) => v => {
+        if (isOverseas(v)) return '';
+        let raw = v[fid];
+        if (raw === undefined || raw === null || raw === '') return '';
+        return tf ? applyTransform(tf, raw) : raw;
+      };
+      // 海外段：仅 is_overseas='Yes' 时写入
+      const ovs = (fid, tf) => v => {
+        if (!isOverseas(v)) return '';
+        let raw = v[fid];
+        if (raw === undefined || raw === null || raw === '') return '';
+        return tf ? applyTransform(tf, raw) : raw;
+      };
+      const domLit = val => v => isOverseas(v) ? '' : val;
+      // 月均交易额 = 年额 / 12，再 USD→JPY
+      const monthlyJpy = v => {
+        const n = Number(String(v.annual_processing_volume_usd ?? '').replace(/[,，%\s]/g, ''));
+        return Number.isFinite(n) && n > 0 ? Math.round(n / 12 * 150) : '';
+      };
+      // Sheet 3 连接方式分支
+      const isWebPay = v => v.paypay_connection_type === 'Online merchant (Web Payment)';
+      const webLit = val => v => (isOverseas(v) && isWebPay(v)) ? val : '';
+      const other = (fid, tf) => v => {
+        if (!isOverseas(v) || isWebPay(v)) return '';
+        let raw = v[fid];
+        if (raw === undefined || raw === null || raw === '') return '';
+        return tf ? applyTransform(tf, raw) : raw;
+      };
+      return [
+        // ===== Sheet 1 公共段（始终写，行 9-34）=====
+        // 填写日期（今天）：O9 年 / Q9 月 / S9 日
+        { sheet: S1, cell: 'O9', compose: () => new Date().getFullYear() },
+        { sheet: S1, cell: 'Q9', compose: () => new Date().getMonth() + 1 },
+        { sheet: S1, cell: 'S9', compose: () => new Date().getDate() },
+        { fieldId: 'company_name_legal',   sheet: S1, cell: 'M10' },
+        { fieldId: 'company_dba_en',       sheet: S1, cell: 'M11' },
+        { fieldId: 'operation_address',    sheet: S1, cell: 'M12' },
+        { composeFields: ['paypay_rep_name_roman'], compose: v => v.paypay_rep_name_roman || '', sheet: S1, cell: 'M13' },
+        { composeFields: ['paypay_rep_name_roman'], compose: v => v.paypay_rep_name_roman || '', sheet: S1, cell: 'M14' },
+        { fieldId: 'business_url',         sheet: S1, cell: 'M15' },
+        { fieldId: 'paypay_capital',       sheet: S1, cell: 'M16' },
+        { fieldId: 'paypay_rep_name_native', sheet: S1, cell: 'M18' },
+        { fieldId: 'paypay_rep_name_roman',  sheet: S1, cell: 'M19' },
+        { fieldId: 'director_address',     sheet: S1, cell: 'M21' },
+        // 代表人 DOB 拆 Y/M/D
+        { fieldId: 'director_dob', sheet: S1, cell: 'O22', transform: 'date_year' },
+        { fieldId: 'director_dob', sheet: S1, cell: 'Q22', transform: 'date_month' },
+        { fieldId: 'director_dob', sheet: S1, cell: 'S22', transform: 'date_day' },
+        { composeFields: ['paypay_rep_name_native'], compose: v => v.paypay_rep_name_native || '', sheet: S1, cell: 'M25' },
+        { composeFields: ['paypay_rep_name_roman'],  compose: v => v.paypay_rep_name_roman || '',  sheet: S1, cell: 'M26' },
+        { composeFields: ['director_address'], compose: v => v.director_address || '', sheet: S1, cell: 'M28' },
+        { fieldId: 'director_dob', sheet: S1, cell: 'O29', transform: 'date_year' },
+        { fieldId: 'director_dob', sheet: S1, cell: 'Q29', transform: 'date_month' },
+        { fieldId: 'director_dob', sheet: S1, cell: 'S29', transform: 'date_day' },
+        // 第 32 行：是否在日本境外
+        { sheet: S1, cell: 'M32', composeFields: ['paypay_is_overseas'],
+          compose: v => v.paypay_is_overseas === 'Yes' ? 'Yes/はい' : (v.paypay_is_overseas === 'No' ? 'No/いいえ' : '') },
+        { composeFields: ['business_reg_number'], compose: v => v.business_reg_number || '', sheet: S1, cell: 'M34' },
+
+        // ===== Sheet 1 仅本土段（is_overseas='No' 时写入，行 36 起）=====
+        // 第 36 行：是否是海外法人子公司 —— 用户只填 sheet 1/3，固定 No
+        { sheet: S1, cell: 'M36', composeFields: ['paypay_is_overseas'], compose: domLit('No/いいえ') },
+        { sheet: S1, cell: 'M41', composeFields: ['paypay_is_overseas', 'paypay_psp_name'], compose: dom('paypay_psp_name') },
+        { sheet: S1, cell: 'M46', composeFields: ['paypay_is_overseas', 'paypay_is_platform'],
+          compose: v => isOverseas(v) ? '' : (v.paypay_is_platform === 'Yes' ? 'Yes/はい' : 'No/いいえ') },
+        { sheet: S1, cell: 'M50', composeFields: ['paypay_is_overseas', 'company_dba_en'], compose: dom('company_dba_en') },
+        { sheet: S1, cell: 'M51', composeFields: ['paypay_is_overseas', 'annual_processing_volume_usd'], compose: dom('annual_processing_volume_usd', 'jpy') },
+        { sheet: S1, cell: 'M52', composeFields: ['paypay_is_overseas', 'annual_processing_volume_usd'],
+          compose: v => isOverseas(v) ? '' : monthlyJpy(v) },
+        { sheet: S1, cell: 'M53', composeFields: ['paypay_is_overseas', 'product_description'], compose: dom('product_description') },
+        { sheet: S1, cell: 'M57', composeFields: ['paypay_is_overseas', 'paypay_payment_method_type'], compose: dom('paypay_payment_method_type') },
+        { sheet: S1, cell: 'M61', composeFields: ['paypay_is_overseas', 'paypay_use_case'], compose: dom('paypay_use_case') },
+        { sheet: S1, cell: 'M64', composeFields: ['paypay_is_overseas', 'business_url'], compose: dom('business_url') },
+        { sheet: S1, cell: 'M65', composeFields: ['paypay_is_overseas', 'paypay_site_in_japanese'], compose: dom('paypay_site_in_japanese') },
+        { sheet: S1, cell: 'M67', composeFields: ['paypay_is_overseas', 'paypay_prices_in_jpy'], compose: dom('paypay_prices_in_jpy') },
+        { sheet: S1, cell: 'M70', composeFields: ['paypay_is_overseas', 'paypay_tos_url'], compose: dom('paypay_tos_url') },
+        { sheet: S1, cell: 'M71', composeFields: ['paypay_is_overseas', 'paypay_tos_refund_clause'], compose: dom('paypay_tos_refund_clause') },
+        { sheet: S1, cell: 'M72', composeFields: ['paypay_is_overseas', 'paypay_legal_notice_url'], compose: dom('paypay_legal_notice_url') },
+        { sheet: S1, cell: 'M73', composeFields: ['paypay_is_overseas', 'paypay_privacy_url'], compose: dom('paypay_privacy_url') },
+        { sheet: S1, cell: 'M75', composeFields: ['paypay_is_overseas', 'paypay_prepaid_instrument'], compose: dom('paypay_prepaid_instrument') },
+        { sheet: S1, cell: 'M76', composeFields: ['paypay_is_overseas', 'paypay_fsa_registration_required'], compose: dom('paypay_fsa_registration_required') },
+        { sheet: S1, cell: 'M78', composeFields: ['paypay_is_overseas', 'paypay_fsa_notified'], compose: dom('paypay_fsa_notified') },
+        { sheet: S1, cell: 'M80', composeFields: ['paypay_is_overseas', 'paypay_fsa_url'], compose: dom('paypay_fsa_url') },
+        { sheet: S1, cell: 'M83', composeFields: ['paypay_is_overseas', 'paypay_connection_type'], compose: dom('paypay_connection_type') },
+        { sheet: S1, cell: 'M93', composeFields: ['paypay_is_overseas', 'paypay_data_server_in_jp'], compose: dom('paypay_data_server_in_jp') },
+        { sheet: S1, cell: 'M94', composeFields: ['paypay_is_overseas', 'paypay_data_server_location'], compose: dom('paypay_data_server_location') },
+        { sheet: S1, cell: 'M95', composeFields: ['paypay_is_overseas', 'paypay_data_access_from_abroad'], compose: dom('paypay_data_access_from_abroad') },
+        { sheet: S1, cell: 'M96', composeFields: ['paypay_is_overseas', 'paypay_data_access_countries'], compose: dom('paypay_data_access_countries') },
+
+        // ===== Sheet 3 海外段（is_overseas='Yes' 时写入）=====
+        { sheet: S3, cell: 'M5', composeFields: ['paypay_is_overseas', 'paypay_jp_legal_rep'], compose: ovs('paypay_jp_legal_rep') },
+        { sheet: S3, cell: 'M6', composeFields: ['paypay_is_overseas', 'paypay_jp_support'], compose: ovs('paypay_jp_support') },
+        { sheet: S3, cell: 'M7', composeFields: ['paypay_is_overseas', 'paypay_support_channels'], compose: ovs('paypay_support_channels') },
+        { sheet: S3, cell: 'M10', composeFields: ['paypay_is_overseas', 'paypay_psp_name'], compose: ovs('paypay_psp_name') },
+        { sheet: S3, cell: 'M15', composeFields: ['paypay_is_overseas', 'paypay_is_platform'],
+          compose: v => !isOverseas(v) ? '' : (v.paypay_is_platform === 'Yes' ? 'Yes/はい' : 'No/いいえ') },
+        { sheet: S3, cell: 'M19', composeFields: ['paypay_is_overseas', 'company_dba_en'], compose: ovs('company_dba_en') },
+        { sheet: S3, cell: 'M20', composeFields: ['paypay_is_overseas', 'annual_processing_volume_usd'], compose: ovs('annual_processing_volume_usd', 'jpy') },
+        { sheet: S3, cell: 'M21', composeFields: ['paypay_is_overseas', 'annual_processing_volume_usd'],
+          compose: v => !isOverseas(v) ? '' : monthlyJpy(v) },
+        { sheet: S3, cell: 'M22', composeFields: ['paypay_is_overseas', 'product_description'], compose: ovs('product_description') },
+        { sheet: S3, cell: 'M26', composeFields: ['paypay_is_overseas', 'paypay_payment_method_type'], compose: ovs('paypay_payment_method_type') },
+        { sheet: S3, cell: 'M30', composeFields: ['paypay_is_overseas', 'paypay_use_case'], compose: ovs('paypay_use_case') },
+        { sheet: S3, cell: 'M33', composeFields: ['paypay_is_overseas', 'business_url'], compose: ovs('business_url') },
+        { sheet: S3, cell: 'M34', composeFields: ['paypay_is_overseas', 'paypay_site_in_japanese'], compose: ovs('paypay_site_in_japanese') },
+        { sheet: S3, cell: 'M36', composeFields: ['paypay_is_overseas', 'paypay_prices_in_jpy'], compose: ovs('paypay_prices_in_jpy') },
+        { sheet: S3, cell: 'M39', composeFields: ['paypay_is_overseas', 'paypay_tos_url'], compose: ovs('paypay_tos_url') },
+        { sheet: S3, cell: 'M40', composeFields: ['paypay_is_overseas', 'paypay_tos_refund_clause'], compose: ovs('paypay_tos_refund_clause') },
+        { sheet: S3, cell: 'M41', composeFields: ['paypay_is_overseas', 'paypay_legal_notice_url'], compose: ovs('paypay_legal_notice_url') },
+        { sheet: S3, cell: 'M42', composeFields: ['paypay_is_overseas', 'paypay_privacy_url'], compose: ovs('paypay_privacy_url') },
+        { sheet: S3, cell: 'M44', composeFields: ['paypay_is_overseas', 'paypay_prepaid_instrument'], compose: ovs('paypay_prepaid_instrument') },
+        { sheet: S3, cell: 'M45', composeFields: ['paypay_is_overseas', 'paypay_fsa_registration_required'], compose: ovs('paypay_fsa_registration_required') },
+        { sheet: S3, cell: 'M47', composeFields: ['paypay_is_overseas', 'paypay_fsa_notified'], compose: ovs('paypay_fsa_notified') },
+        { sheet: S3, cell: 'M49', composeFields: ['paypay_is_overseas', 'paypay_fsa_url'], compose: ovs('paypay_fsa_url') },
+        { sheet: S3, cell: 'M52', composeFields: ['paypay_is_overseas', 'paypay_connection_type'], compose: ovs('paypay_connection_type') },
+        // Web Payment 分支：55/56/58 默认 Yes/はい（57/59 为 If-No 跟进，留空）
+        { sheet: S3, cell: 'M55', composeFields: ['paypay_is_overseas', 'paypay_connection_type'], compose: webLit('Yes/はい') },
+        { sheet: S3, cell: 'M56', composeFields: ['paypay_is_overseas', 'paypay_connection_type'], compose: webLit('Yes/はい') },
+        { sheet: S3, cell: 'M58', composeFields: ['paypay_is_overseas', 'paypay_connection_type'], compose: webLit('Yes/はい') },
+        // 非 Web Payment 分支：数据服务器相关
+        { sheet: S3, cell: 'M62', composeFields: ['paypay_is_overseas', 'paypay_connection_type', 'paypay_data_server_in_jp'],       compose: other('paypay_data_server_in_jp') },
+        { sheet: S3, cell: 'M63', composeFields: ['paypay_is_overseas', 'paypay_connection_type', 'paypay_data_server_location'],    compose: other('paypay_data_server_location') },
+        { sheet: S3, cell: 'M64', composeFields: ['paypay_is_overseas', 'paypay_connection_type', 'paypay_data_access_from_abroad'], compose: other('paypay_data_access_from_abroad') },
+        { sheet: S3, cell: 'M65', composeFields: ['paypay_is_overseas', 'paypay_connection_type', 'paypay_data_access_countries'],   compose: other('paypay_data_access_countries') }
+      ];
+    })(),
+    required: ['paypay_is_overseas', 'company_name_legal', 'company_dba_en', 'operation_address',
+               'business_url', 'paypay_capital', 'paypay_rep_name_native', 'paypay_rep_name_roman',
+               'director_address', 'director_dob', 'paypay_psp_name',
+               'annual_processing_volume_usd', 'product_description', 'paypay_use_case',
+               'paypay_tos_url', 'paypay_legal_notice_url',
+               'paypay_privacy_url', 'paypay_connection_type']
+  },
+
+  // --- 香港 八达通 ---
+  {
+    id: 'hk_octopus',
+    channel: 'hk',
+    displayName: '香港八达通',
+    filename: '香港八达通.xlsx',
+    path: 'templates/香港八达通.xlsx',
+    mappings: [
+      { fieldId: 'company_name_legal',  sheet: 'Sheet1', cell: 'C2' },
+      { fieldId: 'company_name_legal',  sheet: 'Sheet1', cell: 'C3' },
+      { fieldId: 'company_dba_en',      sheet: 'Sheet1', cell: 'C4' },
+      { fieldId: 'company_dba_en',      sheet: 'Sheet1', cell: 'C5' },
+      { fieldId: 'operation_address',   sheet: 'Sheet1', cell: 'C6' },
+      { fieldId: 'business_url',        sheet: 'Sheet1', cell: 'C7' },
+      { fieldId: 'expected_launch_date',sheet: 'Sheet1', cell: 'C8', transform: 'date_slash' },
+      { fieldId: 'mcc',                 sheet: 'Sheet1', cell: 'C9' },
+      { fieldId: 'hk_entity_location',  sheet: 'Sheet1', cell: 'C10' }
+    ],
+    required: ['company_name_legal', 'company_dba_en', 'business_url', 'operation_address', 'mcc']
+  },
+
+  // --- 土耳其 Iyzico ---
+  {
+    id: 'turkey_iyzico',
+    channel: 'turkey',
+    displayName: '土耳其卡 Iyzico',
+    filename: '土耳其卡Turkish Card-Iyzico.xlsx',
+    path: 'templates/土耳其卡Turkish Card-Iyzico.xlsx',
+    mappings: [
+      // B2/B3/B5/B6 为文件附件，由用户手动提交；仅 B4 可自动填写
+      { sheet: 'Sheet1', cell: 'B4',
+        composeFields: ['signer_first_name', 'signer_last_name'],
+        compose: v => [v.signer_first_name, v.signer_last_name].filter(Boolean).join(' ') }
+    ],
+    required: ['signer_first_name']
+  },
+
+  // --- 中东 Tamara ---
+  {
+    id: 'me_tamara',
+    channel: 'middle_east',
+    displayName: '中东 Tamara',
+    filename: '中东Tamara.xlsx',
+    path: 'templates/中东Tamara.xlsx',
+    mappings: [
+      { sheet: 'Sheet1', cell: 'B2', compose: () => 'antom_merchant_onboarding@service.alipay.com' },
+      { fieldId: 'director_email',      sheet: 'Sheet1', cell: 'B3' },
+      { fieldId: 'company_dba_en',      sheet: 'Sheet1', cell: 'B4' },
+      { fieldId: 'tamara_annual_sales', sheet: 'Sheet1', cell: 'B5' },
+      { fieldId: 'business_url',        sheet: 'Sheet1', cell: 'B6' },
+      { fieldId: 'mcc',                 sheet: 'Sheet1', cell: 'B7' },
+      { fieldId: 'tamara_country_reg',  sheet: 'Sheet1', cell: 'B8' },
+      { fieldId: 'tamara_country_ops',  sheet: 'Sheet1', cell: 'B9' },
+      { fieldId: 'company_name_legal',  sheet: 'Sheet1', cell: 'B10' },
+      { fieldId: 'business_reg_number', sheet: 'Sheet1', cell: 'B11' },
+      // B12 Commercial Registration / B13 MOA / B15 Legal ID / B16 KYB = 附件，手动提交
+      { sheet: 'Sheet1', cell: 'B14',
+        composeFields: ['signer_first_name', 'signer_last_name'],
+        compose: v => [v.signer_first_name, v.signer_last_name].filter(Boolean).join(' ') },
+      { fieldId: 'tamara_product',      sheet: 'Sheet1', cell: 'B17' }
+    ],
+    required: ['company_dba_en', 'company_name_legal', 'director_email', 'business_url',
+               'business_reg_number', 'tamara_annual_sales', 'tamara_country_reg',
+               'tamara_country_ops', 'tamara_product']
+  },
+
+  // --- 南美 Dlocal ---
+  {
+    id: 'brazil_dlocal',
+    channel: 'south_america',
+    displayName: '巴西卡 Dlocal',
+    filename: '南美报备材料/Brazilian Card-Dlocal.xlsx',
+    path: 'templates/南美报备材料/Brazilian Card-Dlocal.xlsx',
+    mappings: [
+      { fieldId: 'brazil_country_incorp',  sheet: 'Dlocal', cell: 'B2' },
+      { fieldId: 'brazil_cnpj',            sheet: 'Dlocal', cell: 'B3' },
+      { fieldId: 'brazil_subsellers',      sheet: 'Dlocal', cell: 'B4' },
+      // B5 Director's ID / B6 UBO's ID = 附件，手动提交
+      { fieldId: 'brazil_settlement_time', sheet: 'Dlocal', cell: 'B7' }
+    ],
+    required: ['brazil_country_incorp', 'brazil_cnpj', 'brazil_settlement_time']
+  },
+
+  // --- 南美 STONE ---
+  {
+    id: 'brazil_stone',
+    channel: 'south_america',
+    displayName: '巴西卡 STONE',
+    filename: '南美报备材料/Brazilian cards-STONE.xlsx',
+    path: 'templates/南美报备材料/Brazilian cards-STONE.xlsx',
+    mappings: [
+      { fieldId: 'brazil_cnpj',              sheet: 'Brazilian cards-STONE', cell: 'B2' },
+      // B3 = "Responsible Contact" 标题行，跳过
+      { sheet: 'Brazilian cards-STONE', cell: 'B4',
+        composeFields: ['signer_first_name', 'signer_last_name'],
+        compose: v => [v.signer_first_name, v.signer_last_name].filter(Boolean).join(' ') },
+      { fieldId: 'brazil_contact_email',     sheet: 'Brazilian cards-STONE', cell: 'B5' },
+      { fieldId: 'brazil_cpf',               sheet: 'Brazilian cards-STONE', cell: 'B6' },
+      { fieldId: 'brazil_mother_name',       sheet: 'Brazilian cards-STONE', cell: 'B7' },
+      { fieldId: 'brazil_dob',               sheet: 'Brazilian cards-STONE', cell: 'B8' },
+      { fieldId: 'brazil_position',          sheet: 'Brazilian cards-STONE', cell: 'B9' },
+      { fieldId: 'brazil_monthly_income',    sheet: 'Brazilian cards-STONE', cell: 'B10' },
+      // B11 = "Transactional Data" 标题行，跳过
+      { fieldId: 'brazil_expected_tpv',      sheet: 'Brazilian cards-STONE', cell: 'B12' },
+      { fieldId: 'brazil_installment_share', sheet: 'Brazilian cards-STONE', cell: 'B13' },
+      { fieldId: 'brazil_card_network_share',sheet: 'Brazilian cards-STONE', cell: 'B14' },
+      { fieldId: 'brazil_platinization',     sheet: 'Brazilian cards-STONE', cell: 'B15' },
+      { fieldId: 'brazil_settlement_time',   sheet: 'Brazilian cards-STONE', cell: 'B16' }
+    ],
+    required: ['brazil_cnpj', 'signer_first_name', 'brazil_contact_email', 'brazil_expected_tpv', 'brazil_settlement_time']
+  },
+
+  // --- 南美 Mercado Pago ---
+  {
+    id: 'brazil_mercadopago',
+    channel: 'south_america',
+    displayName: 'Mercado Pago',
+    filename: '南美报备材料/Mercado Pago.xlsx',
+    path: 'templates/南美报备材料/Mercado Pago.xlsx',
+    mappings: [
+      { fieldId: 'company_name_legal',    sheet: 'Sheet1', cell: 'B2' },
+      { fieldId: 'brazil_country_incorp', sheet: 'Sheet1', cell: 'B3' },
+      { fieldId: 'business_url',          sheet: 'Sheet1', cell: 'B4' },
+      { fieldId: 'mcc',                   sheet: 'Sheet1', cell: 'B5' },
+      { fieldId: 'expected_launch_date',  sheet: 'Sheet1', cell: 'B6', transform: 'date_slash' },
+      { fieldId: 'brazil_expected_tpv',   sheet: 'Sheet1', cell: 'B7' },
+      { fieldId: 'mp_product',            sheet: 'Sheet1', cell: 'B8' }
+      // B9 Credit Risk DDQ = 附件，手动提交
+    ],
+    required: ['company_name_legal', 'brazil_country_incorp', 'business_url', 'mcc', 'brazil_expected_tpv', 'mp_product']
+  },
+
+  // --- 南美 PicPay ---
+  {
+    id: 'brazil_picpay',
+    channel: 'south_america',
+    displayName: 'PicPay',
+    filename: '南美报备材料/PicPay.xlsx',
+    path: 'templates/南美报备材料/PicPay.xlsx',
+    mappings: [
+      { fieldId: 'picpay_dedicated_mid', sheet: 'Brazilian cards-STONE', cell: 'B2' },
+      // B3 = 说明行，跳过
+      { fieldId: 'brazil_expected_tpv',  sheet: 'Brazilian cards-STONE', cell: 'B4' },
+      { fieldId: 'brazil_aov',           sheet: 'Brazilian cards-STONE', cell: 'B5' },
+      { fieldId: 'picpay_products',      sheet: 'Brazilian cards-STONE', cell: 'B6' },
+      { fieldId: 'expected_launch_date', sheet: 'Brazilian cards-STONE', cell: 'B7', transform: 'date_slash' }
+    ],
+    required: ['picpay_dedicated_mid', 'brazil_expected_tpv', 'expected_launch_date']
+  },
+
+  // --- 欧洲 PPRO ---
+  {
+    id: 'eu_ppro',
+    channel: 'europe',
+    displayName: 'PPRO',
+    filename: '欧洲/PPRO .xlsx',
+    path: 'templates/欧洲/PPRO .xlsx',
+    mappings: [
+      // UBO 段（Owner information）
+      { fieldId: 'signer_first_name', sheet: 'Sheet1', cell: 'B4' },
+      { fieldId: 'signer_last_name',  sheet: 'Sheet1', cell: 'B6' },
+      { fieldId: 'ppro_native_name',  sheet: 'Sheet1', cell: 'B7' },
+      { fieldId: 'director_dob',      sheet: 'Sheet1', cell: 'B8', transform: 'date_slash' },
+      { fieldId: 'ppro_country',      sheet: 'Sheet1', cell: 'B9' },
+      { fieldId: 'ppro_province',     sheet: 'Sheet1', cell: 'B10' },
+      { fieldId: 'ppro_city',         sheet: 'Sheet1', cell: 'B11' },
+      { fieldId: 'ppro_postal',       sheet: 'Sheet1', cell: 'B12' },
+      { fieldId: 'ppro_street',       sheet: 'Sheet1', cell: 'B13' },
+      // Director 段（默认与 UBO 同一人，镜像写入）
+      { fieldId: 'signer_first_name', sheet: 'Sheet1', cell: 'B17' },
+      { fieldId: 'signer_last_name',  sheet: 'Sheet1', cell: 'B19' },
+      { fieldId: 'ppro_native_name',  sheet: 'Sheet1', cell: 'B20' },
+      { fieldId: 'director_dob',      sheet: 'Sheet1', cell: 'B21', transform: 'date_slash' },
+      { fieldId: 'ppro_country',      sheet: 'Sheet1', cell: 'B22' },
+      { fieldId: 'ppro_province',     sheet: 'Sheet1', cell: 'B23' },
+      { fieldId: 'ppro_city',         sheet: 'Sheet1', cell: 'B24' },
+      { fieldId: 'ppro_postal',       sheet: 'Sheet1', cell: 'B25' },
+      { fieldId: 'ppro_street',       sheet: 'Sheet1', cell: 'B26' }
+    ],
+    required: ['signer_first_name', 'signer_last_name', 'director_dob', 'ppro_country', 'ppro_city', 'ppro_street']
+  },
+
+  // --- 欧洲 Pay by Bank (Token) ---
+  {
+    id: 'eu_paybybank',
+    channel: 'europe',
+    displayName: 'Pay by Bank (Token)',
+    filename: '欧洲/pay by bank-Token.xlsx',
+    path: 'templates/欧洲/pay by bank-Token.xlsx',
+    mappings: [
+      { fieldId: 'eu_sole_trader',     sheet: 'Sheet1', cell: 'B2' },
+      { fieldId: 'eu_publicly_listed', sheet: 'Sheet1', cell: 'B3' },
+      { fieldId: 'eu_uk_only',         sheet: 'Sheet1', cell: 'B4' },
+      { fieldId: 'company_dba_en',     sheet: 'Sheet1', cell: 'B5' },
+      { fieldId: 'company_name_legal', sheet: 'Sheet1', cell: 'B6' },
+      { fieldId: 'business_url',       sheet: 'Sheet1', cell: 'B7' },
+      { fieldId: 'business_reg_number',sheet: 'Sheet1', cell: 'B8' },
+      { sheet: 'Sheet1', cell: 'B9', compose: () => 'PIS: eCommerce merchant payment' },
+      { fieldId: 'eu_jurisdiction',    sheet: 'Sheet1', cell: 'B10' },
+      { fieldId: 'mcc',                sheet: 'Sheet1', cell: 'B11' },
+      { fieldId: 'eu_ubo_count',       sheet: 'Sheet1', cell: 'B12' },
+      // UBO1（默认与 Director / Signatory 同一人）
+      { sheet: 'Sheet1', cell: 'B13',
+        composeFields: ['signer_first_name', 'signer_last_name'],
+        compose: v => [v.signer_first_name, v.signer_last_name].filter(Boolean).join(' ') },
+      { fieldId: 'director_address',   sheet: 'Sheet1', cell: 'B14' },
+      { fieldId: 'director_dob',       sheet: 'Sheet1', cell: 'B15', transform: 'date_slash' },
+      { fieldId: 'eu_director_count',  sheet: 'Sheet1', cell: 'B16' },
+      // Director1
+      { sheet: 'Sheet1', cell: 'B17',
+        composeFields: ['signer_first_name', 'signer_last_name'],
+        compose: v => [v.signer_first_name, v.signer_last_name].filter(Boolean).join(' ') },
+      { fieldId: 'director_address',   sheet: 'Sheet1', cell: 'B18' },
+      { fieldId: 'director_dob',       sheet: 'Sheet1', cell: 'B19', transform: 'date_slash' },
+      // Signatory
+      { sheet: 'Sheet1', cell: 'B20',
+        composeFields: ['signer_first_name', 'signer_last_name'],
+        compose: v => [v.signer_first_name, v.signer_last_name].filter(Boolean).join(' ') },
+      { fieldId: 'director_address',   sheet: 'Sheet1', cell: 'B21' },
+      { fieldId: 'director_dob',       sheet: 'Sheet1', cell: 'B22', transform: 'date_slash' }
+    ],
+    required: ['company_dba_en', 'company_name_legal', 'business_url', 'business_reg_number',
+               'eu_jurisdiction', 'mcc', 'signer_first_name', 'signer_last_name',
+               'director_address', 'director_dob']
   }
 ];
 

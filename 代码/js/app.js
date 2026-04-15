@@ -109,6 +109,25 @@ function renderFill(root) {
     return;
   }
 
+  // 根据 signer 姓名的语言自动填 PayPay 董事/UBO 姓名（CJK→母语字段，否则→罗马字字段）
+  (() => {
+    const fn = state.values.signer_first_name || '';
+    const ln = state.values.signer_last_name || '';
+    if (!fn && !ln) return;
+    const hasCJK = /[\u4e00-\u9fff\u3400-\u4dbf\u3040-\u309f\u30a0-\u30ff]/.test(fn + ln);
+    if (hasCJK) {
+      if (!state.values.paypay_rep_name_native) {
+        state.values.paypay_rep_name_native = ln + fn;
+        persist();
+      }
+    } else {
+      if (!state.values.paypay_rep_name_roman) {
+        state.values.paypay_rep_name_roman = [fn, ln].filter(Boolean).join(' ');
+        persist();
+      }
+    }
+  })();
+
   // 计算字段并集
   const neededFieldIds = new Set();
   const requiredSet = new Set();
@@ -125,9 +144,11 @@ function renderFill(root) {
 
   // 日本 APM：根据 japan_payment_methods 过滤条件字段（showIfMethod）
   const jpMethods = Array.isArray(state.values.japan_payment_methods) ? state.values.japan_payment_methods : [];
+  const isWebPay = state.values.paypay_connection_type === 'Online merchant (Web Payment)';
   const isFieldActive = (f) => {
-    if (!f.showIfMethod) return true;
-    return f.showIfMethod.some(m => jpMethods.includes(m));
+    if (f.showIfMethod && !f.showIfMethod.some(m => jpMethods.includes(m))) return false;
+    if (f.hideIfWebPay && isWebPay) return false;
+    return true;
   };
 
   // 工具栏
@@ -245,6 +266,7 @@ function renderField(f, required, no) {
   input.addEventListener('input', e => {
     state.values[f.id] = e.target.value;
     persistDebounced();
+    if (f.id === 'paypay_connection_type') render();
   });
   wrap.appendChild(input);
   return wrap;

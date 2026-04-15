@@ -41,6 +41,11 @@ const TRANSFORMS = {
     return String(v).toLowerCase().includes('sole') || String(v).toLowerCase() === 'individual' ? 'Individual' : 'Corporate';
   },
 
+  // 日期拆分：取年/月/日，去掉前导零
+  date_year:  v => v ? String(v).slice(0, 4) : '',
+  date_month: v => v ? String(v).slice(5, 7).replace(/^0/, '') : '',
+  date_day:   v => v ? String(v).slice(8, 10).replace(/^0/, '') : '',
+
   // USD → JPY（固定汇率 150，四舍五入为整数）
   jpy: v => {
     if (v === null || v === undefined || v === '') return '';
