@@ -22,7 +22,8 @@ const FIELD_GROUPS = [
   { id: 'ch_turkey',     label: '渠道专属 · 土耳其 Iyzico' },
   { id: 'ch_tamara',     label: '渠道专属 · 中东 Tamara' },
   { id: 'ch_brazil',     label: '渠道专属 · 南美（Dlocal / STONE / Mercado Pago / PicPay）' },
-  { id: 'ch_europe',     label: '渠道专属 · 欧洲（PPRO / Pay by Bank）' }
+  { id: 'ch_europe',     label: '渠道专属 · 欧洲（PPRO / Pay by Bank）' },
+  { id: 'ch_grabpay',    label: '渠道专属 · 菲律宾 GrabPay' }
 ];
 
 const FIELDS = [
@@ -124,7 +125,8 @@ const FIELDS = [
     options: ['自建风控', '采购第三方服务', '全量3D校验', '无'],
     default: ['自建风控', '采购第三方服务', '全量3D校验'] },
   { id: 'order_amount_min_usd',  labelZh: '订单金额最小值（USD）',                labelEn: 'Order Amount Min',      type: 'number',   group: 'financial', default: 10 },
-  { id: 'order_amount_max_usd',  labelZh: '订单金额最大值（USD）',                labelEn: 'Order Amount Max',      type: 'number',   group: 'financial', default: 1000 },
+  { id: 'order_amount_max_usd',  labelZh: '订单金额最大值（USD）',                labelEn: 'Order Amount Max',      type: 'number',   group: 'financial', default: 1000,
+    hint: '不要写太高，最好不要超过 200 USD' },
   { id: 'ddq_recurring',         labelZh: 'DDQ · 是否周期性扣款',                 labelEn: 'Recurring Payment',     type: 'select',   group: 'ch_ddq', options: ['Yes', 'No'], default: 'No' },
   { id: 'ddq_bnpl',              labelZh: 'DDQ · 是否 Buy Now Pay Later',        labelEn: 'BNPL',                  type: 'select',   group: 'ch_ddq', options: ['Yes', 'No'], default: 'No' },
   { id: 'ddq_layaway',           labelZh: 'DDQ · 是否 Layaway 付款',             labelEn: 'Layaway',               type: 'select',   group: 'ch_ddq', options: ['Yes', 'No'], default: 'No' },
@@ -292,6 +294,11 @@ const FIELDS = [
   { id: 'eu_jurisdiction',    labelZh: 'Pay by Bank · 注册国家 / 地区',   labelEn: 'Jurisdiction',                  type: 'text',   group: 'ch_europe', placeholder: 'e.g. United Kingdom' },
   { id: 'eu_ubo_count',       labelZh: 'Pay by Bank · UBO 数量',          labelEn: 'Number of UBOs',                type: 'number', group: 'ch_europe', default: 1 },
   { id: 'eu_director_count',  labelZh: 'Pay by Bank · 董事数量',          labelEn: 'Number of Directors',           type: 'number', group: 'ch_europe', default: 1 },
+
+  // --- 菲律宾 GrabPay ---
+  { id: 'grabpay_customer_profile', labelZh: 'GrabPay · 客户群体比例',     labelEn: 'Customer Profile (%)',          type: 'textarea', group: 'ch_grabpay',
+    placeholder: 'Locals 50% / Corporate 30% / Tourist 20% / Others 0% / Base: 10,000',
+    default: 'Locals 50% / Corporate 30% / Tourist 20% / Others 0% / Base: 10,000' }
 
 ];
 
@@ -484,6 +491,32 @@ const TEMPLATES = [
     ],
     required: ['company_name_legal', 'business_reg_number', 'company_dba_en',
                'operation_address', 'mcc', 'business_url', 'expected_launch_date']
+  },
+
+  // --- 菲律宾 GrabPay ---
+  {
+    id: 'ph_grabpay',
+    channel: 'sea',
+    displayName: '菲律宾 GrabPay Merchant Underwriting Form',
+    filename: '菲律宾 GrabPay Merchant Underwriting Form.xlsx',
+    path: 'templates/philippines_GrabPay.xlsx',
+    mappings: [
+      { fieldId: 'company_name_legal',        sheet: 'Sheet1', cell: 'B3' },
+      { fieldId: 'company_dba_en',            sheet: 'Sheet1', cell: 'B4' },
+      { fieldId: 'business_reg_number',       sheet: 'Sheet1', cell: 'B5' },
+      { fieldId: 'company_type',              sheet: 'Sheet1', cell: 'B6' },
+      { fieldId: 'incorporation_date',        sheet: 'Sheet1', cell: 'B7', transform: 'date_slash' },
+      { fieldId: 'business_url',              sheet: 'Sheet1', cell: 'B9' },
+      { fieldId: 'mcc',                       sheet: 'Sheet1', cell: 'B10' },
+      { fieldId: 'monthly_volume_usd',        sheet: 'Sheet1', cell: 'B11' },
+      { fieldId: 'avg_transaction_value',     sheet: 'Sheet1', cell: 'B12' },
+      { fieldId: 'grabpay_customer_profile',  sheet: 'Sheet1', cell: 'B13' },
+      { sheet: 'Sheet1', cell: 'B17',
+        composeFields: ['signer_first_name', 'signer_last_name'],
+        compose: v => [v.signer_first_name, v.signer_last_name].filter(Boolean).join(' ') }
+    ],
+    required: ['company_name_legal', 'business_reg_number', 'business_url',
+               'mcc', 'monthly_volume_usd', 'avg_transaction_value']
   },
 
   // --- 台湾 JKOPay ---

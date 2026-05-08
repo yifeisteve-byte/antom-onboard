@@ -199,9 +199,10 @@ function renderField(f, required, no) {
   const val = state.values[f.id] ?? '';
   const reqMark = required ? '<span class="req">*</span>' : '';
   const labelEn = f.labelEn ? `<span class="label-en">${escape(f.labelEn)}</span>` : '';
+  const labelHint = f.hint ? `<span class="label-hint">${escape(f.hint)}</span>` : '';
   const prefix = no ? `${no}. ` : '';
   const wrap = h(`<div class="field" data-fid="${f.id}">
-    <label>${prefix}${escape(f.labelZh)}${reqMark}${labelEn}</label>
+    <label>${prefix}${escape(f.labelZh)}${reqMark}${labelEn}${labelHint}</label>
   </div>`);
 
   let input;
